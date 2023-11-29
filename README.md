@@ -1,11 +1,25 @@
+# EDA for Japanese
+
+## Diff from original EDA
+- Word Tokenizer: Use Unidic/IPADIC
+- Synonym Acquire: Use Conceptnet
+TBA
+
+## How to use
+
+```bash
+$ pip install -e .
+$ python -c "import nltk; nltk.download('wordnet');"  # for English
+```
+
 # EDA: Easy Data Augmentation Techniques for Boosting Performance on Text Classification Tasks
 [![Conference](http://img.shields.io/badge/EMNLP-2019-4b44ce.svg)](https://arxiv.org/abs/1901.11196)
 
 For a survey of data augmentation in NLP, see this [repository](https://github.com/styfeng/DataAug4NLP/blob/main/README.md)/this [paper](http://arxiv.org/abs/2105.03075).
 
-This is the code for the EMNLP-IJCNLP paper [EDA: Easy Data Augmentation techniques for boosting performance on text classification tasks.](https://arxiv.org/abs/1901.11196) 
+This is the code for the EMNLP-IJCNLP paper [EDA: Easy Data Augmentation techniques for boosting performance on text classification tasks.](https://arxiv.org/abs/1901.11196)
 
-A blog post that explains EDA is [[here]](https://medium.com/@jason.20/these-are-the-easiest-data-augmentation-techniques-in-natural-language-processing-you-can-think-of-88e393fd610). 
+A blog post that explains EDA is [[here]](https://medium.com/@jason.20/these-are-the-easiest-data-augmentation-techniques-in-natural-language-processing-you-can-think-of-88e393fd610).
 
 Update: find an external implementation of EDA in Chinese [[here]](https://github.com/zhanlaoban/EDA_NLP_for_Chinese).
 
@@ -46,13 +60,13 @@ python
 You can easily write your own implementation, but this one takes input files in the format `label\tsentence` (note the `\t`). So for instance, your input file should look like this (example from stanford sentiment treebank):
 
 ```
-1   neil burger here succeeded in making the mystery of four decades back the springboard for a more immediate mystery in the present 
-0   it is a visual rorschach test and i must have failed 
+1   neil burger here succeeded in making the mystery of four decades back the springboard for a more immediate mystery in the present
+0   it is a visual rorschach test and i must have failed
 0   the only way to tolerate this insipid brutally clueless film might be with a large dose of painkillers
 ...
 ```
 
-Now place this input file into the `data` folder. Run 
+Now place this input file into the `data` folder. Run
 
 ```bash
 python code/augment.py --input=<insert input filename>
