@@ -108,24 +108,24 @@ def eda_ja(
         n_sr = max(1, int(alpha_sr * num_words))
         for _ in range(num_new_per_technique):
             a_words = synonym_replacement(words, n_sr, synonym_extractor)
-            augmented_sentences.append(" ".join(a_words))
+            augmented_sentences.append("".join(a_words))
 
     if alpha_ri > 0:
         n_ri = max(1, int(alpha_ri * num_words))
         for _ in range(num_new_per_technique):
             a_words = random_insertion(words, n_ri, synonym_extractor)
-            augmented_sentences.append(" ".join(a_words))
+            augmented_sentences.append("".join(a_words))
 
     if alpha_rs > 0:
         n_rs = max(1, int(alpha_rs * num_words))
         for _ in range(num_new_per_technique):
             a_words = random_swap(words, n_rs)
-            augmented_sentences.append(" ".join(a_words))
+            augmented_sentences.append("".join(a_words))
 
     if p_rd > 0:
         for _ in range(num_new_per_technique):
             a_words = random_deletion(words, p_rd)
-            augmented_sentences.append(" ".join(a_words))
+            augmented_sentences.append("".join(a_words))
 
     augmented_sentences = [get_only_chars(sentence) for sentence in augmented_sentences]
     random.shuffle(augmented_sentences)
