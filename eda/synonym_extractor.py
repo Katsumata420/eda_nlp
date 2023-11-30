@@ -1,11 +1,15 @@
 """Synonym Extractor for Japanese"""
-import json
+import csv
+import os
 from abc import ABC, abstractmethod
 from urllib3.util import Retry
-from typing import List
+from typing import List, Dict, Optional, Set
 
 import requests
 from requests.adapters import HTTPAdapter
+
+from .tokenizer import SudachiTokenizer
+
 
 class BaseSynonymExtractor(ABC):
     @abstractmethod
@@ -25,15 +29,47 @@ class BaseSynonymExtractor(ABC):
 
 
 class SudachiSynonymExtractor(BaseSynonymExtractor):
-    def __init__(self):
-        pass
+    """Sudachi synonym extractor.
+
+    TODO: Use chikkar https://github.com/WorksApplications/chikkar/
+    """
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    synonym_path = os.path.join(current_dir, "resource/sudachi_synonyms.txt")
+    def __init__(self, tokenizer: SudachiTokenizer):
+        assert os.path.isfile(self.synonym_path), f"Not Found Synonym data at {self.synonym_path}."
+        self.synonym_data = self._load_synonyms()
+        self.tokenizer = tokenizer
+
+    def _load_synonyms(self) -> Dict[int, Set[str]]:
+        with open(self.synonym_path, "r") as f:
+            reader = csv.reader(f)
+            data = [row for row in reader]
+
+        synonym_data: Dict[int, Set[str]] = {}
+        synonym_set = set()  # 8th index
+        synonym_group_id: Optional[int] = None  # 0th index
+        for line in data:
+            if not line:
+                if synonym_group_id is not None:
+                    synonym_data[synonym_group_id] = synonym_set
+                synonym_set = set()
+                synonym_group_id = None
+            else:
+                synonym_group_id = int(line[0])
+                synonym_set.add(line[8])
+        return synonym_data
 
     @property
     def name(self) -> str:
         return "sudachi"
 
     def get_synonyms(self, word: str) -> List[str]:
-        pass
+        synonym_group_ids = self.tokenizer.get_synonym_group_ids(word)
+        synonyms = set()
+        for synonym_group_id in synonym_group_ids:
+            synonyms |= self.synonym_data.get(synonym_group_id, set())
+        synonyms = synonyms - {word}  # Remove original word
+        return list(synonyms)
 
 
 class ConceptNetSynonymExtractor(BaseSynonymExtractor):
