@@ -29,3 +29,6 @@ unidic_lite = [
 
 [tool.setuptools]
 packages = ["eda"]
+
+[tool.setuptools.dynamic]
+version = {attr = "eda.version"}
