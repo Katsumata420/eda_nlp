@@ -1,7 +1,9 @@
 import functools
+import os
 from abc import ABC, abstractmethod
 from typing import List
 
+import fugashi
 from sudachipy import tokenizer as sudachi_tokenizer
 from sudachipy import dictionary
 
@@ -11,7 +13,7 @@ class BaseTokenizer(ABC):
     def tokenize(self, text: str) -> List[str]:
         pass
 
-    @staticmethod
+    @property
     @abstractmethod
     def name(self) -> str:
         pass
@@ -23,7 +25,7 @@ class SudachiTokenizer(BaseTokenizer):
         mode = sudachi_tokenizer.Tokenizer.SplitMode.C
         self.tokenizer = functools.partial(self.tokenizer.tokenize, mode=mode)
 
-    @staticmethod
+    @property
     def name(self) -> str:
         return "sudachi"
 
@@ -36,12 +38,28 @@ class SudachiTokenizer(BaseTokenizer):
 
 
 class MeCabTokenizer(BaseTokenizer):
-    def __init__(self):
-        pass
+    supported_dictionaries = ["unidic", "unidic_lite", "ipadic"]
+    def __init__(self, dictionary: str = "ipadic"):
+        assert dictionary in self.supported_dictionaries
+        dic_dir: str
+        if dictionary == "ipadic":
+            import ipadic
+            dic_dir = ipadic.DICDIR
+        elif dictionary == "unidic":
+            import unidic
+            dic_dir = unidic.DICDIR
+        elif dictionary == "unidic_lite":
+            import unidic_lite
+            dic_dir = unidic_lite.DICDIR
 
-    @staticmethod
+        mecabrc = os.path.join(dic_dir, "mecabrc")
+        mecab_option = f'-d "{dic_dir}" -r "{mecabrc}" -Owakati'
+
+        self.tokenizer = fugashi.GenericTagger(mecab_option)
+
+    @property
     def name(self) -> str:
         return "mecab"
 
-    def tokenize(self, text: str) -> list:
-        pass
+    def tokenize(self, text: str) -> List[str]:
+        return self.tokenizer.parse(text).split()

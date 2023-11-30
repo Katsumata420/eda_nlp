@@ -11,12 +11,20 @@ dependencies = [
     "requests >=2.31.0, <3",
     "spacy >=3.7.2, <4",
     "SudachiPy >=0.6.0, <1",
-    "SudachiDict-core == 20230927"
+    "SudachiDict-core == 20230927",
+    "fugashi >= 1.3.0, <2",
+    "ipadic == 1.0.0",
 ]
 
 [project.optional-dependencies]
 dev = [
     "pytest >=7, <8"
+]
+unidic = [
+    "unidic == 1.1.0"
+]
+unidic_lite = [
+    "unidic-lite == 1.0.8"
 ]
 
 [tool.setuptools]
