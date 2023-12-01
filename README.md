@@ -1,15 +1,19 @@
 # EDA for Japanese
 
 ## Diff from original EDA
-- Word Tokenizer: Use Unidic/IPADIC
-- Synonym Acquire: Use Conceptnet
-TBA
+- Word Tokenizer: Use Unidic/IPADIC/Sudachi
+- Synonym Acquire: Use Conceptnet/Sudachi
 
 ## How to use
 
 ```bash
 $ pip install -e .
 $ python -c "import nltk; nltk.download('wordnet');"  # for English
+$ pip install -e ".[unidic]" && python -m unidic download  # for Japanese-Unidic
+$ python -m eda.augment --input /path/to/data.tsv  # for English
+$ python -m eda.augment --input /path/to/data.tsv --lang ja  # for Japanese (use Sudachi Synonym)
+$ python -m eda.augment --input /path/to/data.tsv --lang ja --tokenizer mecab --synonym_extractor conceptnet  # for Japanese (use Conceptnet Synonym with ipadic)
+$ python -m eda.augment --input /path/to/data.tsv --lang ja --tokenizer mecab --synonym_extractor conceptnet --mecab-dict unidic  # for Japanese (use Conceptnet Synonym with unidic)
 ```
 
 # EDA: Easy Data Augmentation Techniques for Boosting Performance on Text Classification Tasks

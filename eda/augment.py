@@ -1,7 +1,11 @@
 # Easy data augmentation techniques for text classification
 # Jason Wei and Kai Zou
+import functools
 
-from eda import *
+from .eda import eda as eda_en
+from .eda_japanese import eda_ja
+from .tokenizer import get_tokenizer
+from .synonym_extractor import get_synonym_extractor
 
 #arguments to be parsed from command line
 import argparse
@@ -13,6 +17,13 @@ ap.add_argument("--alpha_sr", required=False, type=float, help="percent of words
 ap.add_argument("--alpha_ri", required=False, type=float, help="percent of words in each sentence to be inserted")
 ap.add_argument("--alpha_rs", required=False, type=float, help="percent of words in each sentence to be swapped")
 ap.add_argument("--alpha_rd", required=False, type=float, help="percent of words in each sentence to be deleted")
+ap.add_argument("--add_original", required=False, type=bool, help="whether to add original sentence in augmented data", default=False)
+# For Japanese
+ap.add_argument("--lang", required=False, type=str, help="language", default="en", choices=["en", "ja"])
+ap.add_argument("--tokenizer", required=False, type=str, help="tokenizer to use", default="sudachi")
+ap.add_argument("--mecab-dict", required=False, type=str, help="mecab dictionary to use", default="ipadic")
+ap.add_argument("--synonym_extractor", required=False, type=str, help="synonym extractor to use", default="sudachi")
+
 args = ap.parse_args()
 
 #the output file
@@ -52,7 +63,16 @@ if alpha_sr == alpha_ri == alpha_rs == alpha_rd == 0:
      ap.error('At least one alpha should be greater than zero')
 
 #generate more data with standard augmentation
-def gen_eda(train_orig, output_file, alpha_sr, alpha_ri, alpha_rs, alpha_rd, num_aug=9):
+def gen_eda(
+    eda_func,
+    train_orig,
+    output_file,
+    alpha_sr,
+    alpha_ri,
+    alpha_rs,
+    alpha_rd,
+    num_aug=9,
+) -> None:
 
     writer = open(output_file, 'w')
     lines = open(train_orig, 'r').readlines()
@@ -61,7 +81,7 @@ def gen_eda(train_orig, output_file, alpha_sr, alpha_ri, alpha_rs, alpha_rd, num
         parts = line[:-1].split('\t')
         label = parts[0]
         sentence = parts[1]
-        aug_sentences = eda(sentence, alpha_sr=alpha_sr, alpha_ri=alpha_ri, alpha_rs=alpha_rs, p_rd=alpha_rd, num_aug=num_aug)
+        aug_sentences = eda_func(sentence, alpha_sr=alpha_sr, alpha_ri=alpha_ri, alpha_rs=alpha_rs, p_rd=alpha_rd, num_aug=num_aug)
         for aug_sentence in aug_sentences:
             writer.write(label + "\t" + aug_sentence + '\n')
 
@@ -71,5 +91,26 @@ def gen_eda(train_orig, output_file, alpha_sr, alpha_ri, alpha_rs, alpha_rd, num
 #main function
 if __name__ == "__main__":
 
+    if args.lang == "en":
+        eda_func = eda_en
+    elif args.lang == "ja":
+        tokenizer = get_tokenizer(args.tokenizer, args.mecab_dict)
+        extractor = get_synonym_extractor(args.synonym_extractor, tokenizer)
+        eda_func = functools.partial(
+            eda_ja,
+            tokenizer=tokenizer,
+            synonym_extractor=extractor,
+        )
+    else:
+        raise ValueError("Invalid language.")
     #generate augmented sentences and output into a new file
-    gen_eda(args.input, output, alpha_sr=alpha_sr, alpha_ri=alpha_ri, alpha_rs=alpha_rs, alpha_rd=alpha_rd, num_aug=num_aug)
+    gen_eda(
+        eda_func,
+        args.input,
+        output,
+        alpha_sr=alpha_sr,
+        alpha_ri=alpha_ri,
+        alpha_rs=alpha_rs,
+        alpha_rd=alpha_rd,
+        num_aug=num_aug,
+    )
