@@ -63,3 +63,12 @@ class MeCabTokenizer(BaseTokenizer):
 
     def tokenize(self, text: str) -> List[str]:
         return self.tokenizer.parse(text).split()
+
+
+def get_tokenizer(name: str, dictionary: str = "ipadic") -> BaseTokenizer:
+    if name == "sudachi":
+        return SudachiTokenizer()
+    elif name == "mecab":
+        return MeCabTokenizer(dictionary=dictionary)
+    else:
+        raise ValueError(f"Invalid tokenizer name: {name}")

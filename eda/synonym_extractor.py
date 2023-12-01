@@ -118,3 +118,12 @@ EXTRACTOR = {
     "sudachi": SudachiSynonymExtractor,
     "conceptnet": ConceptNetSynonymExtractor,
 }
+
+
+def get_synonym_extractor(name: str, tokenizer: SudachiTokenizer) -> BaseSynonymExtractor:
+    if name == "sudachi":
+        return SudachiSynonymExtractor(tokenizer)
+    elif name == "conceptnet":
+        return ConceptNetSynonymExtractor()
+    else:
+        raise ValueError("Invalid synonym extractor.")
