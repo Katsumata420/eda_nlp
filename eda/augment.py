@@ -17,7 +17,7 @@ ap.add_argument("--alpha_sr", required=False, type=float, help="percent of words
 ap.add_argument("--alpha_ri", required=False, type=float, help="percent of words in each sentence to be inserted")
 ap.add_argument("--alpha_rs", required=False, type=float, help="percent of words in each sentence to be swapped")
 ap.add_argument("--alpha_rd", required=False, type=float, help="percent of words in each sentence to be deleted")
-ap.add_argument("--add_original", required=False, type=bool, help="whether to add original sentence in augmented data", default=False)
+ap.add_argument("--add_original", action="store_true", help="whether to add original sentence in augmented data")
 # For Japanese
 ap.add_argument("--lang", required=False, type=str, help="language", default="en", choices=["en", "ja"])
 ap.add_argument("--tokenizer", required=False, type=str, help="tokenizer to use", default="sudachi")
